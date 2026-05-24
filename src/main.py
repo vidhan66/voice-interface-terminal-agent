@@ -1,21 +1,24 @@
 from audio import record_audio
 from stt import transcribe
-from agent import ask_agent
+from agent import Agent
 
 
 def main():
 
-    audio_path = record_audio()
+    agent = Agent()
+    while True:
+        input("Press enter to record audio...")
+        audio_path = record_audio()
 
-    text = transcribe(audio_path)
+        text = transcribe(audio_path)
+        print(f"User: {text}")
+        if(text.lower() in ["close", "quit", "stop", "exit"]):
+            print("Closing...")
+            break
+        response = agent.ask(text)
 
-    print("\nYou said:")
-    print(text)
-
-    response = ask_agent(text)
-
-    print("\nAgent Response:\n")
-    print(response)
+        print("\nAgent Response:\n")
+        print(response)
 
 
 if __name__ == "__main__":
