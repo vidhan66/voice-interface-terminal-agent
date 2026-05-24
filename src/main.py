@@ -11,6 +11,7 @@ def main():
         audio_path = record_audio()
 
         text = transcribe(audio_path)
+
         print(f"User: {text}")
         if(text.lower() in ["close", "quit", "stop", "exit"]):
             print("Closing...")
