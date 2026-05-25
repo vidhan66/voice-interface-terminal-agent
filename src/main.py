@@ -1,6 +1,6 @@
-from audio import record_audio
-from stt import transcribe
-from agent import Agent
+from src.audio import record_audio
+from src.stt import transcribe
+from src.agent import Agent
 
 
 def main():

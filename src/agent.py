@@ -1,16 +1,15 @@
 import ollama
 import subprocess
-from intent import classify
+from src.intent import classify
+from prompts.loader import load
 
 class Agent:
     def __init__(self):
+        self.PROMPTS = load("prompts/prompt.yaml")
         self.messages = [
             {
                 "role": "system",
-                "content": """You are a terminal coding assistant. Be concise.
-                    Focus on coding, debugging, shell commands,system design, and 
-                    engineering help.
-                """
+                "content": self.PROMPTS["system_prompt"]
             }
         ]
 
@@ -34,42 +33,10 @@ class Agent:
             return str(e)
     
     def get_shell_command(self, prompt):
-
         messages = [
             {
                 "role": "system",
-                "content": """
-                    You are a shell command generator.
-
-                    Your task:
-                    Convert user requests into EXACTLY ONE shell command.
-
-                    STRICT RULES:
-                    - Return ONLY the command.
-                    - No explanations.
-                    - No markdown.
-                    - No code blocks.
-                    - No extra text.
-                    - No quotes around command.
-                    - Assume Windows PowerShell.
-
-                    Examples:
-                    User: list files
-                    Output:
-                    dir
-
-                    User: show current directory
-                    Output:
-                    pwd
-
-                    User: create a folder named test
-                    Output:
-                    mkdir test
-
-                    User: run app.py
-                    Output:
-                    python app.py
-                    """
+                "content": self.PROMPTS["shell_command"]
             },
             {
                 "role": "user",
@@ -115,7 +82,7 @@ class Agent:
             else:
                 self.messages.append({
                     "role": "assistant",
-                    "content": "Command execution cancelled by user."
+                    "content": self.PROMPTS["cancelled_command"] 
                 })
                 return "Command execution cancelled by user."
         else :
