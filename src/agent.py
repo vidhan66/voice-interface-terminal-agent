@@ -1,6 +1,7 @@
 import ollama
 import subprocess
 from intent import classify
+
 class Agent:
     def __init__(self):
         self.messages = [
@@ -77,7 +78,7 @@ class Agent:
         ]
 
         response = ollama.chat(
-            model="qwen2.5:3b",
+            model="qwen2.5-coder:7b",
             messages=messages
         )
 
