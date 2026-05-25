@@ -105,11 +105,19 @@ class Agent:
         if(intent == True):
             shell_command = self.get_shell_command(prompt)
             print(f"Executing command: {shell_command}")
-            output = self.run_command(shell_command)
-            answer = f"Command: {shell_command}\nOutput: {output}"
-            print(answer)
-            self.messages.append({"role": "assistant", "content": answer})
-            return answer
+            confirm = input("Do you want to execute this command? (y/n): ")
+            if(confirm.lower()=='y'):
+                output = self.run_command(shell_command)
+                answer = f"Command: {shell_command}\nOutput: {output}"
+                print(answer)
+                self.messages.append({"role": "assistant", "content": answer})
+                return answer
+            else:
+                self.messages.append({
+                    "role": "assistant",
+                    "content": "Command execution cancelled by user."
+                })
+                return "Command execution cancelled by user."
         else :
             response = ollama.chat(
                 model="qwen2.5:3b",
