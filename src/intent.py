@@ -3,7 +3,7 @@ from prompts.loader import load
 def classify(text):
     PROMPTS = load("prompts/prompt.yaml")
     response = ollama.chat(
-        model="qwen2.5:3b",
+        model="qwen2.5:7b",
         messages=[
             {
                 "role": "system",
@@ -15,5 +15,4 @@ def classify(text):
             }
         ]
     )
-    label = response["message"]["content"].strip()
-    return label == "TERMINAL"
+    return response["message"]["content"].strip().upper()

@@ -4,7 +4,7 @@ from scipy.io.wavfile import write
 
 def record_audio(
     filename="temp.wav",
-    duration=5,
+    duration=10,
     sample_rate=16000
 ):
 
