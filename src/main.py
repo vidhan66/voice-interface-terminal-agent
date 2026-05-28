@@ -1,15 +1,18 @@
-from src.audio import record_audio
+from src.mic import MicStream
 from src.stt import transcribe
 from src.agent import Agent
+from src.display import Display
 
 def main():
+    display = Display()
+    display.banner() 
 
     agent = Agent()
     while True:
-        #input("Press enter to record audio...")
-        #audio_path = record_audio()
-        text = "list all files, find hello.js and write binary search code in it and run the file"
-        #text = transcribe(audio_path)
+        input("Press enter to record audio...")
+        audio = MicStream()
+        #text = "list all files, find hello.js and write binary search code in it and run the file"
+        text = transcribe(audio)
 
         print(f"User: {text}")
         if(text.lower() in ["close", "quit", "stop", "exit"]):

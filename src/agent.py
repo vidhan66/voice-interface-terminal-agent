@@ -3,6 +3,55 @@ import subprocess
 from src.intent import classify
 from prompts.loader import load
 from src.tools import list_files, read_file
+import os
+import yaml
+
+def load_config() -> dict:
+    try:
+        with open("config.yaml", "r") as f:
+            return yaml.safe_load(f)
+    except FileNotFoundError:
+        return {}
+
+CONFIG = load_config()
+
+def detect_model(task: str = "chat") -> tuple[str, str]:
+
+    backend = (
+        os.environ.get("LLM_BACKEND")        
+        or CONFIG.get("llm_backend")        
+        or "auto"                            
+    ).lower()
+
+    if backend == "auto":
+        if os.environ.get("ANTHROPIC_API_KEY"):
+            backend = "anthropic"
+        elif os.environ.get("OPENAI_API_KEY"):
+            backend = "openai"
+        elif os.environ.get("GEMINI_API_KEY"):
+            backend = "gemini"
+        else:
+            backend = "ollama"
+            
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return "anthropic", os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
+
+    if os.environ.get("OPENAI_API_KEY"):
+        return "openai", os.environ.get("OPENAI_MODEL", "gpt-4o")
+
+    if os.environ.get("GEMINI_API_KEY"):
+        return "gemini", os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+
+    if task == "code":
+        return "ollama", os.environ.get(
+                    "OLLAMA_CODE_MODEL",
+                    CONFIG.get("ollama_code_model", "qwen2.5-coder:7b")
+                )
+    
+    return "ollama", os.environ.get(
+                "OLLAMA_CHAT_MODEL",
+                CONFIG.get("ollama_chat_model", "qwen2.5:7b")
+            )
 
 class Agent:
     def __init__(self):
