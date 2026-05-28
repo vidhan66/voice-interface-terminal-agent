@@ -4,14 +4,7 @@ from src.intent import classify
 from prompts.loader import load
 from src.tools import list_files, read_file
 import os
-import yaml
-
-def load_config() -> dict:
-    try:
-        with open("config.yaml", "r") as f:
-            return yaml.safe_load(f)
-    except FileNotFoundError:
-        return {}
+from src.config import load_config
 
 CONFIG = load_config()
 

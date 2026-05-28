@@ -1,6 +1,10 @@
 # STT
 stt_model: small
 
+# VAD
+vad_threshold: 300
+silence_cutoff: 1.8
+
 # ── LLM backend ──────────────────────────────────────────────────────────────
 # Auto-detected from env vars. Set one to switch away from local Ollama.
 #

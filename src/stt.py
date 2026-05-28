@@ -1,8 +1,11 @@
 from faster_whisper import WhisperModel
 import numpy as np
+from src.config import load_config
+
+CONFIG = load_config()
 
 model = WhisperModel(
-    "small",
+    CONFIG.get("stt_model"),
     device="cpu",
     compute_type="int8"
 )
