@@ -53,7 +53,6 @@ class Agent:
         self.messages = [
             {"role": "system","content": self.PROMPTS["system_prompt"]}
         ]
-        self._confirm = confirm_callback or (lambda cmd: True)
 
     def chat_once(self, messages: list, task: str = "chat") -> str:
         """
@@ -176,8 +175,8 @@ class Agent:
     def handle_terminal(self, prompt: str) -> Generator[str, None, None]:
         shell_command = self.get_shell_command(prompt)
         yield f"\nExecuting command: {shell_command}\n"
-        confirmed = self._confirm(shell_command)
-        if confirmed:
+        confirmed = input(f"Confirm execution? (y/n): ")
+        if (confirmed.lower() == "y"):
             output = self.run_command(shell_command)
             answer = f"[Output]\n{output}"
             self.messages.append({"role": "assistant", "content": answer})
