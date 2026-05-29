@@ -17,5 +17,5 @@ silence_cutoff: 1.8
 llm_backend: ollama
 
 # Ollama local model defaults (used only when no API key is set)
-ollama_chat_model: "qwen2.5:7b"
+ollama_chat_model: "qwen2.5:3b"
 ollama_code_model: "qwen2.5-coder:7b"

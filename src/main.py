@@ -40,11 +40,10 @@ def main():
             display.info("Goodbye!")
             break
 
-        response = agent.ask(text)
-
-        print("\nAgent Response:\n")
-        print(response)
-
+        display.agent_start()
+        for token in agent.ask_stream(text):
+            display.token(token)
+        display.agent_stop()
 
 if __name__ == "__main__":
     main()
