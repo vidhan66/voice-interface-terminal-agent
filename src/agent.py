@@ -51,7 +51,7 @@ class Agent:
     def __init__(self, confirm_callback: Callable[[str], bool] | None = None):
         self.PROMPTS = load("prompts/prompt.yaml")
         self.messages = [
-            {"role": "system","content": self.PROMPTS["system_prompt"]}
+            {"role": "system","content": "Your name is Voker" + self.PROMPTS["system_prompt"]}
         ]
 
     def chat_once(self, messages: list, task: str = "chat") -> str:

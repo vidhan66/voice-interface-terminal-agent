@@ -1,9 +1,12 @@
+import threading
+from src.listener import Listener
 from src.mic import MicStream
 from src.vad import SilenceDetector
 from src.stt import transcribe
 from src.agent import Agent
 from src.display import Display
 import numpy as np
+import time
 
 def record_until_silence(mic: MicStream, display: Display) -> np.ndarray:
     display.info("Listening... speak now")
@@ -28,15 +31,33 @@ def main():
     mic.start()
 
     agent = Agent()
-    while True:
-        input("Press enter to speak...")
-        audio = record_until_silence(mic, display)
-        #text = "list all files, find hello.js and write binary search code in it and run the file"
-        text = transcribe(audio)
 
-        display.user_said(text)
-        
-        if(text.lower() in ["close", "quit", "stop", "exit"]):
+    prompt_queue = []
+    prompt_lock  = threading.Lock()
+
+    listener = Listener(
+        mic = mic,
+        prompt_lock = prompt_lock,
+        prompt_queue = prompt_queue,
+        display = display,
+    )
+    listener_thread = threading.Thread(target=listener.run, daemon=True)
+    listener_thread.start()
+
+    display.info("Say 'Hey Voker' to begin")
+
+    while True:
+        with prompt_lock:
+            if prompt_queue:
+                text = prompt_queue.pop(0)
+            else:
+                text = None
+
+        if text is None:
+            time.sleep(0.05)
+            continue
+
+        if text.lower().strip() in ["close", "quit", "stop", "exit"]:
             display.info("Goodbye!")
             break
 
