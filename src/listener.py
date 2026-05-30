@@ -58,11 +58,15 @@ class Listener:
         self,
         mic: MicStream,
         prompt_lock: threading.Lock,
+        cancel_event: threading.Event,
+        agent_busy: threading.Event,
         prompt_queue: list,
         display: Display,
     ):
         self._mic = mic
         self._lock = prompt_lock
+        self._cancel = cancel_event
+        self._busy = agent_busy
         self._queue = prompt_queue
         self._display = display
         self._detector = load_wake_word_detector()
@@ -70,7 +74,10 @@ class Listener:
     def run(self):
         self._display.info("Listener ready — say 'Hey Voker' to begin")
         while True:
-            self.watch_for_wake_word()
+            if self._busy.is_set():
+                self.watch_for_interrupt()
+            else:
+                self.watch_for_wake_word()
 
     def watch_for_wake_word(self):
         frame = self._mic.read_frame()

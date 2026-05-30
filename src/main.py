@@ -5,6 +5,7 @@ from src.vad import SilenceDetector
 from src.stt import transcribe
 from src.agent import Agent
 from src.display import Display
+from src.runner import AgentRunner
 import numpy as np
 import time
 
@@ -27,6 +28,11 @@ def main():
     display = Display()
     display.banner()
 
+    cancel_event = threading.Event()   
+    prompt_queue = []                  
+    prompt_lock = threading.Lock()
+    agent_busy = threading.Event()
+
     mic = MicStream()
     mic.start()
 
@@ -37,34 +43,29 @@ def main():
 
     listener = Listener(
         mic = mic,
+        cancel_event = cancel_event,
         prompt_lock = prompt_lock,
         prompt_queue = prompt_queue,
+        agent_busy = agent_busy,
         display = display,
     )
+    runner = AgentRunner(
+        cancel_event = cancel_event,
+        prompt_lock = prompt_lock,
+        prompt_queue = prompt_queue,
+        agent_busy = agent_busy,
+        display = display,
+    )
+
     listener_thread = threading.Thread(target=listener.run, daemon=True)
+    runner_thread = threading.Thread(target=runner.run, daemon=True)
     listener_thread.start()
+    runner_thread.start()
 
     display.info("Say 'Hey Voker' to begin")
 
     while True:
-        with prompt_lock:
-            if prompt_queue:
-                text = prompt_queue.pop(0)
-            else:
-                text = None
-
-        if text is None:
-            time.sleep(0.05)
-            continue
-
-        if text.lower().strip() in ["close", "quit", "stop", "exit"]:
-            display.info("Goodbye!")
-            break
-
-        display.agent_start()
-        for token in agent.ask_stream(text):
-            display.token(token)
-        display.agent_stop()
+        time.sleep(1)
 
 if __name__ == "__main__":
     main()
