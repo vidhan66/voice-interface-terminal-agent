@@ -17,10 +17,10 @@ Say **"Hey Voker"** and start talking. No keypresses needed.
 ## Architecture
 
 ```
-┌──────────────┐   audio   ┌─────────────────┐   prompt   ┌──────────────┐
+┌──────────────┐   audio   ┌──────────────────┐   prompt   ┌──────────────┐
 │  MicThread   │ ────────► │  ListenerThread  │ ─────────► │ AgentThread  │
 │ ring buffer  │           │ wake + VAD + STT │            │  streaming   │
-└──────────────┘           └─────────────────┘            └──────────────┘
+└──────────────┘           └──────────────────┘            └──────────────┘
                                     │                              │
                                     │  cancel_event (interrupt)    │
                                     └──────────────────────────────┘
@@ -30,6 +30,21 @@ Three OS threads share a single `threading.Event` (`cancel_event`).
 When you speak during generation, ListenerThread sets the event,
 AgentThread stops streaming, and the new utterance replaces the old prompt.
 
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| Wake word detection | [Vosk](https://alphacephei.com/vosk/) — offline, Apache 2.0 |
+| Speech-to-text | [faster-whisper](https://github.com/SYSTRAN/faster-whisper) — local Whisper, MIT |
+| Voice activity detection | Energy-based RMS threshold (custom, zero deps) |
+| LLM — local | [Ollama](https://ollama.com) + qwen2.5:7b / qwen2.5-coder:7b |
+| LLM — cloud | Anthropic Claude / OpenAI GPT / Google Gemini (optional, via API key) |
+| External agent | [Aider](https://aider.chat) — Apache 2.0 |
+| Audio capture | [sounddevice](https://python-sounddevice.readthedocs.io) |
+| Language | Python 3.12 |
+
+## Demo Video
+https://github.com/user-attachments/assets/16f8a14d-d009-4570-9f41-15421445a992
 ## LLM Backend
 
 Runs fully offline by default using Ollama. Export any one API key to
