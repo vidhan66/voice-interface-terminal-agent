@@ -67,7 +67,7 @@ class AgentRunner:
         return None
 
 class CustomBackend:
-    """Wraps the existing CustomAgent with streaming + cancellation."""
+    """Wraps the existing Agent with streaming + cancellation."""
 
     def __init__(self, display: Display):
         self._agent   = Agent()

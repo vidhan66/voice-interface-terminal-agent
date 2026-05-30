@@ -6,6 +6,8 @@ from prompts.loader import load
 from src.tools import list_files, read_file
 import os
 from src.config import load_config
+from dotenv import load_dotenv
+load_dotenv()
 
 CONFIG = load_config()
 

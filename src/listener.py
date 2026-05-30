@@ -6,22 +6,28 @@ from src.stt import transcribe
 from src.display import Display
 from src.vad import is_speech, SilenceDetector
 from vosk import Model, KaldiRecognizer
+from src.config import load_config
 import json, os
 
-def load_wake_word_detector():
-    try:
-        return VoskKWSDetector()
-    except Exception:
-        pass
-    return EnergyKeywordFallback()
+CONFIG = load_config()
 
+def load_wake_word_detector():
+    backend = CONFIG.get("wake_word_backend", "vosk")
+    if backend == "vosk":
+        try:
+            return VoskKWSDetector()
+        except Exception as e:
+            print(f"  ⚠  Vosk failed to load: {e}, falling back to energy detector")
+            return EnergyKeywordFallback()
+    
+    elif backend == "energy":
+        return EnergyKeywordFallback()
+    
+    else:
+        print(f"  ⚠  Unknown wake_word_backend '{backend}', falling back to energy detector")
+        return EnergyKeywordFallback()
+    
 class VoskKWSDetector:
-    """
-    Vosk keyword spotting — fully offline, no API key needed.
-    Requires:  pip install vosk
-    Model:     download from https://alphacephei.com/vosk/models
-               e.g. vosk-model-small-en-us-0.15, place in ./models/vosk/
-    """
 
     KEYWORDS = ["hey voker"]
 
@@ -42,7 +48,7 @@ class VoskKWSDetector:
 
 class EnergyKeywordFallback:
 
-    THRESHOLD = 2000  # RMS amplitude
+    THRESHOLD = 500  # RMS amplitude
 
     def process(self, frame: np.ndarray) -> bool:
         rms = int(np.sqrt(np.mean(frame.astype(np.float32) ** 2)))
@@ -70,6 +76,8 @@ class Listener:
         self._queue = prompt_queue
         self._display = display
         self._detector = load_wake_word_detector()
+        #print(f"[detector] using: {self._detector.__class__.__name__}", flush=True)
+
 
     def run(self):
         self._display.info("Listener ready — say 'Hey Voker' to begin")

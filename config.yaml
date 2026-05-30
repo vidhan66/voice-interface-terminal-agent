@@ -5,6 +5,10 @@ stt_model: small
 vad_threshold: 300
 silence_cutoff: 1.8
 
+# Wake word
+wake_word_backend: vosk  # vosk | energy
+
+
 # ── LLM backend ──────────────────────────────────────────────────────────────
 # Auto-detected from env vars. Set one to switch away from local Ollama.
 #
@@ -19,7 +23,7 @@ llm_backend: ollama
 # Agent mode
 # custom      → your built-in agent (this repo)
 # aider       → Aider CLI
-agent_mode: aider
+agent_mode: custom
 
 # Ollama local model defaults (used only when no API key is set)
 ollama_chat_model: "qwen2.5:3b"
